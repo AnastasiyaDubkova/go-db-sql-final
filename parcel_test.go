@@ -34,9 +34,9 @@ func TestAddGetDelete(t *testing.T) {
 	// prepare
 	// настройте подключение к БД
 	db, err := sql.Open("sqlite", "tracker.db")
-	if err != nil {
-		require.NoError(t, err)
-	}
+
+	require.NoError(t, err)
+
 	defer db.Close()
 
 	store := NewParcelStore(db)
@@ -63,7 +63,8 @@ func TestAddGetDelete(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = store.Get(parcel.Number)
-	require.Equal(t, sql.ErrNoRows, err)
+	require.Error(t, err)
+	assert.ErrorIs(t, err, sql.ErrNoRows)
 }
 
 // TestSetAddress проверяет обновление адреса
@@ -71,9 +72,9 @@ func TestSetAddress(t *testing.T) {
 	// prepare
 	// настройте подключение к БД
 	db, err := sql.Open("sqlite", "tracker.db")
-	if err != nil {
-		require.NoError(t, err)
-	}
+
+	require.NoError(t, err)
+
 	defer db.Close()
 
 	store := NewParcelStore(db)
@@ -105,9 +106,9 @@ func TestSetStatus(t *testing.T) {
 	// prepare
 	// настройте подключение к БД
 	db, err := sql.Open("sqlite", "tracker.db")
-	if err != nil {
-		require.NoError(t, err)
-	}
+
+	require.NoError(t, err)
+
 	defer db.Close()
 
 	store := NewParcelStore(db)
@@ -137,9 +138,9 @@ func TestGetByClient(t *testing.T) {
 	// prepare
 	// настройте подключение к БД
 	db, err := sql.Open("sqlite", "tracker.db")
-	if err != nil {
-		require.NoError(t, err)
-	}
+
+	require.NoError(t, err)
+
 	defer db.Close()
 
 	store := NewParcelStore(db)
@@ -184,11 +185,9 @@ func TestGetByClient(t *testing.T) {
 		// убедитесь, что все посылки из storedParcels есть в parcelMap
 		require.Equal(t, parcelMap[parcel.Number], parcel)
 		// убедитесь, что значения полей полученных посылок заполнены верно
-		assert.NotEmpty(t, parcel.Number)
-		assert.NotEmpty(t, parcel.Client)
-		assert.NotEmpty(t, parcel.Status)
-		assert.NotEmpty(t, parcel.Address)
-		assert.NotEmpty(t, parcel.CreatedAt)
-
+		require.Equal(t, parcelMap[parcel.Number].Client, parcel.Client)
+		require.Equal(t, parcelMap[parcel.Number].Address, parcel.Address)
+		require.Equal(t, parcelMap[parcel.Number].Status, parcel.Status)
+		require.Equal(t, parcelMap[parcel.Number].CreatedAt, parcel.CreatedAt)
 	}
 }
